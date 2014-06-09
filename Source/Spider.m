@@ -10,16 +10,19 @@
 
 //speed per pixel
 static const float SPEED = 15.f;
-@implementation Spider
+@implementation Spider{
+    id actionMoveDone;
+}
 
 //we treat this as a spider spawn
 - (void)didLoadFromCCB
 {
+    _walking=true;
+    _blocked=false;
+    self.path = [NSMutableArray array];
+    _currentPathIndex = 0;
     [self setContentSize:CGSizeMake(50, 30)];
-    CCLOG(@"asd %f %f",[self anchorPoint].x,[self anchorPoint].y);
-    // call method to start animation after random delay
-//    CCActionRotateBy* actionSpin = [CCActionRotateBy actionWithDuration:1.5f angle:360];
-//    [self runAction:[CCActionRepeatForever actionWithAction:actionSpin]];
+    
     [self startSpawn];
 }
 
@@ -47,24 +50,47 @@ static const float SPEED = 15.f;
     [animationManager runAnimationsForSequenceNamed:@"Standing"];
 }
 
+-(void)walkPath{
+    if (_currentPathIndex<[[self path] count]) {
+        NSValue *nsv = ([self.path objectAtIndex:_currentPathIndex]);
+        CGPoint pt = [nsv CGPointValue];
+        
+        if (_walking&&!_blocked) {
+            _blocked=true;
+            [self walkTo:pt];
+            _currentPathIndex++;
+        }
+    }else if(!_blocked&&_walking){
+        _walking=false;
+        CCLOG(@"Done with path");
+        _currentPathIndex=0;
+        [self.path removeAllObjects];
+        
+        [self stopAllActions];
+        [self startStanding];
+    }
+}
+
 -(void)walkTo:(CGPoint)dst{
     CGPoint vector = ccpSub(dst, self.position);
     CGFloat rotateAngle = -ccpToAngle(vector);
     CGFloat currentTouch = CC_RADIANS_TO_DEGREES(rotateAngle);
     CGFloat ang = currentTouch-self.rotation-90;
+    CCLOG(@"angle is %f",ang);
     float len = ccpLength(vector);
     float time = len/SPEED;
-    [self runAction:[CCActionRotateBy actionWithDuration:1.f angle:ang]];
-    [self startWalk];
-    [self runAction:[CCActionMoveTo actionWithDuration:time position:dst]];
-    [self performSelector:@selector(startStanding) withObject:nil afterDelay:time];
-//    CCLOG(@"should take %f angle of %f from old angle of %f",len/SPEED,ang,self.rotation);
-
+    [self runAction:[CCActionRotateBy actionWithDuration:0.25f angle:ang]];
+    [self runAction:[CCActionSequence actions:[CCActionMoveTo actionWithDuration:time position:dst], [CCActionCallFunc actionWithTarget:self selector:@selector(Done)],[CCActionCallFunc actionWithTarget:self selector:@selector(walkPath)], nil]];
 }
+
+-(void)Done
+{
+    _blocked=false;
+}
+
 -(void)update:(CCTime)delta
 {
-
-                          
+    [self walkPath];
 }
 
 @end

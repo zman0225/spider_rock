@@ -9,5 +9,12 @@
 #import "CCSprite.h"
 
 @interface Spider : CCSprite
+@property (nonatomic,strong) NSMutableArray *path;
+@property (nonatomic) int currentPathIndex;
+@property (nonatomic) bool walking;
+@property (nonatomic) bool blocked;
 -(void)walkTo:(CGPoint)dst;
+-(void)walkPath;
+-(void)startWalk;
+
 @end
