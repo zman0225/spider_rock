@@ -8,7 +8,7 @@
 
 #import "CCSprite.h"
 
-@interface Spider : CCSprite
+@interface Spider : CCSprite 
 @property (nonatomic,strong) NSMutableArray *path;
 @property (nonatomic) int currentPathIndex;
 @property (nonatomic) bool walking;
@@ -16,8 +16,10 @@
 @property (nonatomic) long mode;
 @property (nonatomic) NSInteger speed;
 @property (nonatomic) float detectionRange;
+@property (nonatomic) int ownerID;
+@property (nonatomic) float attack;
 
+-(void)initializeSpiderWithID:(int)ownerID range:(float)range attack:(float)attack;
 -(void)walkPath;
 -(void)collidedWith:(Spider *)sp;
-
 @end

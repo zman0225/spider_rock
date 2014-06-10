@@ -7,7 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Spider.h"
 
 @interface Team : NSObject
+@property (nonatomic) int teamID;
+@property (nonatomic) float points;
+@property (nonatomic,strong) NSMutableArray *spiders;
+
+-(id)init;
+-(Spider*)returnTouchedSpider:(CGPoint)touchLocation;
+-(Spider*)addSpiderWithX:(float)x andY:(float)y;
 
 @end

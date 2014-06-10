@@ -22,15 +22,35 @@
     [self setSpiderMode:SModeSpawn];
 }
 
--(void)collidedWith:(Spider *)sp{
-    
+-(void)initializeSpiderWithID:(int)ownerID range:(float)range attack:(float)attack
+{
+    [self setOwnerID:ownerID];
+    [self setDetectionRange:range];
+    [self setAttack:attack];
 }
 
+-(void)collidedWith:(Spider *)sp{
+    //attack!
+    CCLOG(@"ids of %d %d",self.ownerID,sp.ownerID);
+    if (self.ownerID!=sp.ownerID) {
+        [self rotate:ccpSub(sp.position, self.position)];
+        
+        // generate a random number between 0.0 and 2.0
+        float delay = (arc4random() % 500) / 1000.f;
+        // call method to start animation after random delay
+        [self performSelector:@selector(startAttacking) withObject:nil afterDelay:delay];
+        
+    }
+}
+-(void)startAttacking
+{
+    [self setSpiderMode:SModeAttack];
+}
 -(void)setSpiderMode:(SpiderMode)mode{
-    if ((mode==[self mode])&&(SModeLast<=mode||mode<0)) {
+    if (((NSInteger)mode==[self mode])||(SModeLast<=mode||mode<0)) {
         return;
     }
-    
+    [self stopAllActions];
     [self setMode:(long)mode];
     CCBAnimationManager* animationManager = [self userObject];
     switch (mode) {
@@ -48,6 +68,10 @@
             
         case SModeDeath:
             [animationManager runAnimationsForSequenceNamed:@"Death"];
+            break;
+        
+        case SModeAttack:
+            [animationManager runAnimationsForSequenceNamed:@"Attacking"];
             break;
             
         default:
@@ -67,7 +91,7 @@
         }
     }else if(!_blocked&&_walking){
         _walking=false;
-        CCLOG(@"Done with path");
+//        CCLOG(@"Done with path");
         _currentPathIndex=0;
         [self.path removeAllObjects];
         
