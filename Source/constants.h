@@ -9,6 +9,13 @@
 #ifndef SpiderRock_constants_h
 #define SpiderRock_constants_h
 
-
+//spider mode enums
+typedef NS_ENUM(NSInteger, SpiderMode) {
+    SModeStanding,
+    SModeWalking,
+    SModeSpawn,
+    SModeDeath,
+    SModeLast
+};
 
 #endif

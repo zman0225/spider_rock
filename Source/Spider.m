@@ -7,55 +7,60 @@
 //
 
 #import "Spider.h"
+#import "constants.h"
 
-//speed per pixel
-static const float SPEED = 15.f;
-@implementation Spider{
-    id actionMoveDone;
-}
+@implementation Spider
 
 //we treat this as a spider spawn
 - (void)didLoadFromCCB
 {
-    _walking=true;
-    _blocked=false;
-    self.path = [NSMutableArray array];
-    _currentPathIndex = 0;
-    [self setContentSize:CGSizeMake(50, 30)];
+    [self setSpeed:15.f];
+    [self setWalking:true];
+    [self setBlocked:false];
+    [self setPath:[NSMutableArray array]];
+    [self setCurrentPathIndex:0];
+    [self setSpiderMode:SModeSpawn];
+}
+
+-(void)collidedWith:(Spider *)sp{
     
-    [self startSpawn];
 }
 
-- (void)startSpawn
-{
-    // the animation manager of each node is stored in the 'userObject' property
-    CCBAnimationManager* animationManager = self.userObject;
-    // timelines can be referenced and run by name
-    [animationManager runAnimationsForSequenceNamed:@"Spawn"];
-}
-
-- (void)startWalk
-{
-    // the animation manager of each node is stored in the 'userObject' property
-    CCBAnimationManager* animationManager = self.userObject;
-    // timelines can be referenced and run by name
-    [animationManager runAnimationsForSequenceNamed:@"Walking"];
-}
-
-- (void)startStanding
-{
-    // the animation manager of each node is stored in the 'userObject' property
-    CCBAnimationManager* animationManager = self.userObject;
-    // timelines can be referenced and run by name
-    [animationManager runAnimationsForSequenceNamed:@"Standing"];
+-(void)setSpiderMode:(SpiderMode)mode{
+    if ((mode==[self mode])&&(SModeLast<=mode||mode<0)) {
+        return;
+    }
+    
+    [self setMode:(long)mode];
+    CCBAnimationManager* animationManager = [self userObject];
+    switch (mode) {
+        case SModeSpawn:
+            [animationManager runAnimationsForSequenceNamed:@"Spawn"];
+            break;
+        
+        case SModeStanding:
+            [animationManager runAnimationsForSequenceNamed:@"Standing"];
+            break;
+            
+        case SModeWalking:
+            [animationManager runAnimationsForSequenceNamed:@"Walking"];
+            break;
+            
+        case SModeDeath:
+            [animationManager runAnimationsForSequenceNamed:@"Death"];
+            break;
+            
+        default:
+            break;
+    }
 }
 
 -(void)walkPath{
     if (_currentPathIndex<[[self path] count]) {
-        NSValue *nsv = ([self.path objectAtIndex:_currentPathIndex]);
-        CGPoint pt = [nsv CGPointValue];
-        
         if (_walking&&!_blocked) {
+            NSValue *nsv = ([self.path objectAtIndex:_currentPathIndex]);
+            CGPoint pt = [nsv CGPointValue];
+            [self setSpiderMode:SModeWalking];
             _blocked=true;
             [self walkTo:pt];
             _currentPathIndex++;
@@ -67,19 +72,29 @@ static const float SPEED = 15.f;
         [self.path removeAllObjects];
         
         [self stopAllActions];
-        [self startStanding];
+        [self setSpiderMode:SModeStanding];
     }
+}
+
+-(void)rotate:(CGPoint)vect{
+    CGFloat rotateAngle = -ccpToAngle(vect);
+    CGFloat currentTouch = CC_RADIANS_TO_DEGREES(rotateAngle);
+    CGFloat ang = currentTouch-self.rotation-90;
+    if (ABS(ang)>180) {
+        if (ang<0) {
+            ang = 360-ABS(ang);
+        }else{
+            ang = -(360-ang);
+        }
+    }
+    [self runAction:[CCActionRotateBy actionWithDuration:0.25f angle:ang]];
 }
 
 -(void)walkTo:(CGPoint)dst{
     CGPoint vector = ccpSub(dst, self.position);
-    CGFloat rotateAngle = -ccpToAngle(vector);
-    CGFloat currentTouch = CC_RADIANS_TO_DEGREES(rotateAngle);
-    CGFloat ang = currentTouch-self.rotation-90;
-    CCLOG(@"angle is %f",ang);
     float len = ccpLength(vector);
-    float time = len/SPEED;
-    [self runAction:[CCActionRotateBy actionWithDuration:0.25f angle:ang]];
+    float time = len/[self speed];
+    [self rotate:vector];
     [self runAction:[CCActionSequence actions:[CCActionMoveTo actionWithDuration:time position:dst], [CCActionCallFunc actionWithTarget:self selector:@selector(Done)],[CCActionCallFunc actionWithTarget:self selector:@selector(walkPath)], nil]];
 }
 

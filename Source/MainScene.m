@@ -18,6 +18,7 @@
 }
 
 -(void)didLoadFromCCB{
+    _physicsNode.debugDraw=true;
     self.userInteractionEnabled=YES;
     _spiders = [NSMutableArray array];
 }
@@ -35,7 +36,6 @@
             [_touchedSpider.path addObject:[NSValue valueWithCGPoint:touchLoc]];
             
             _touchedSpider.walking=true;
-            [_touchedSpider startWalk];
             return;
         }
     }
@@ -111,7 +111,7 @@
         
         glLineWidth(lineWidth);
         
-        int count = [_touchedSpider.path count];
+        unsigned long count = [_touchedSpider.path count];
         
         for (int i = 0; i < (count - 1); i++){
             CGPoint pos1 = [[_touchedSpider.path objectAtIndex:i] CGPointValue];

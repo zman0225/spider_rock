@@ -13,8 +13,11 @@
 @property (nonatomic) int currentPathIndex;
 @property (nonatomic) bool walking;
 @property (nonatomic) bool blocked;
--(void)walkTo:(CGPoint)dst;
+@property (nonatomic) long mode;
+@property (nonatomic) NSInteger speed;
+@property (nonatomic) float detectionRange;
+
 -(void)walkPath;
--(void)startWalk;
+-(void)collidedWith:(Spider *)sp;
 
 @end
