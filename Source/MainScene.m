@@ -52,7 +52,6 @@
             _touched=true;
             _lastPoint=touchLoc;
             _touchedSpider = sp;
-            [_touchedSpider setWalking:true];
             return;
         }
     }
@@ -68,8 +67,7 @@
     
     if (ccpDistance(_lastPoint, location) > 15) {
         //SAVE THE POINT
-        [_touchedSpider.path addObject:[NSValue valueWithCGPoint:location]];
-        [_touchedSpider setWalking:true];
+        [_touchedSpider addPointToPath:location];
         
         _lastPoint = location;
     }
@@ -79,8 +77,7 @@
     if (_touched) {
         _touched=!_touched;
         CGPoint touchLoc = [touch locationInNode:self];
-        [_touchedSpider.path addObject:[NSValue valueWithCGPoint:touchLoc]];
-       [_touchedSpider setWalking:true];
+        [_touchedSpider addPointToPath:touchLoc];
         _touchedSpider = nil;
     }
 }

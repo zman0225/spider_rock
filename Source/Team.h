@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Spider.h"
+#import "constants.h"
 
 @interface Team : NSObject
 @property (nonatomic) int teamID;

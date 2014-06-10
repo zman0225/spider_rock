@@ -18,8 +18,13 @@
 @property (nonatomic) float detectionRange;
 @property (nonatomic) int ownerID;
 @property (nonatomic) float attack;
+@property (nonatomic) NSSet *inRange;
+@property (nonatomic) CCNode *target;
 
 -(void)initializeSpiderWithID:(int)ownerID range:(float)range attack:(float)attack;
 -(void)walkPath;
 -(void)collidedWith:(Spider *)sp;
+-(void)resetPath;
+-(void) addPointToPath:(CGPoint)pt;
+
 @end

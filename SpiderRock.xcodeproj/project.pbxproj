@@ -36,6 +36,7 @@
 		B77F1B4017B978D7009739AE /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B77F1B3F17B978D7009739AE /* CoreGraphics.framework */; };
 		B77F1B4217B978D7009739AE /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B77F1B4117B978D7009739AE /* CoreText.framework */; };
 		FE0771581946B81C00482184 /* Team.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0771571946B81C00482184 /* Team.m */; };
+		FE4B1583194791E500807327 /* Base.m in Sources */ = {isa = PBXBuildFile; fileRef = FE4B1582194791E500807327 /* Base.m */; };
 		FEC67D7B19460A5000A66C6E /* Spider.m in Sources */ = {isa = PBXBuildFile; fileRef = FEC67D7A19460A5000A66C6E /* Spider.m */; };
 /* End PBXBuildFile section */
 
@@ -93,6 +94,8 @@
 		FE0771551946A3DB00482184 /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constants.h; path = Source/constants.h; sourceTree = "<group>"; };
 		FE0771561946B81C00482184 /* Team.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Team.h; path = Source/Team.h; sourceTree = "<group>"; };
 		FE0771571946B81C00482184 /* Team.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Team.m; path = Source/Team.m; sourceTree = "<group>"; };
+		FE4B1581194791E500807327 /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Base.h; path = Source/Base.h; sourceTree = "<group>"; };
+		FE4B1582194791E500807327 /* Base.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Base.m; path = Source/Base.m; sourceTree = "<group>"; };
 		FEC67D7919460A5000A66C6E /* Spider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Spider.h; path = Source/Spider.h; sourceTree = "<group>"; };
 		FEC67D7A19460A5000A66C6E /* Spider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Spider.m; path = Source/Spider.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -138,6 +141,8 @@
 				FE0771551946A3DB00482184 /* constants.h */,
 				FE0771561946B81C00482184 /* Team.h */,
 				FE0771571946B81C00482184 /* Team.m */,
+				FE4B1581194791E500807327 /* Base.h */,
+				FE4B1582194791E500807327 /* Base.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -334,6 +339,7 @@
 				B737893F1807617C0076A88C /* AppDelegate.m in Sources */,
 				B7378994180767190076A88C /* MainScene.m in Sources */,
 				FEC67D7B19460A5000A66C6E /* Spider.m in Sources */,
+				FE4B1583194791E500807327 /* Base.m in Sources */,
 				B73789871807631A0076A88C /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -7,7 +7,6 @@
 //
 
 #import "Team.h"
-
 static int ID = 0;
 
 @implementation Team
@@ -31,11 +30,7 @@ static int ID = 0;
         CGRect rect = CGRectMake(sp.position.x+sp.contentSize.width/2, sp.position.y+sp.contentSize.height/2, -1*sp.contentSize.width, -1*sp.contentSize.height);
 
         if (CGRectContainsPoint(rect,touchLocation)) {
-
-            [sp setCurrentPathIndex:0];
-            [[sp path] removeAllObjects];
-            [[sp path] addObject:[NSValue valueWithCGPoint:touchLocation]];
-            [sp setWalking:true];
+            [sp resetPath];
             return sp;
         }
     }
