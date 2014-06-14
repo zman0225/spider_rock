@@ -20,11 +20,16 @@
 @property (nonatomic) float attack;
 @property (nonatomic) NSSet *inRange;
 @property (nonatomic) CCNode *target;
+@property (nonatomic) CCNode *touchedTarget;
+@property (nonatomic) float capacity;
+@property (nonatomic) float health;
+
 
 -(void)initializeSpiderWithID:(int)ownerID range:(float)range attack:(float)attack;
 -(void)walkPath;
 -(void)collidedWith:(Spider *)sp;
 -(void)resetPath;
 -(void) addPointToPath:(CGPoint)pt;
+-(void) addPointToPathToFollow:(CGPoint)pt;
 
 @end

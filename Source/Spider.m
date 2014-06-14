@@ -14,21 +14,30 @@
 const static float UPDATE_TIME = 0.5f;
 @implementation Spider{
     float _updateTimeCtr;
+    CCLabelTTF *_debugMode;
 }
 
 //we treat this as a spider spawn
 - (void)didLoadFromCCB
 {
+    CCLOG(@"label say %@",[_debugMode string]);
     [self setAttack:15.f];
-    [self setSpeed:15.f];
+    [self setSpeed:25.f];
     [self setWalking:true];
     [self setBlocked:false];
     [self setPath:[NSMutableArray array]];
     [self setCurrentPathIndex:0];
     [self setSpiderMode:SModeSpawn];
     [self setTarget:nil];
-    [self setDetectionRange:25];
+    [self setDetectionRange:45];
     self.inRange = [[NSSet alloc] init];
+}
+
+-(void)setColor:(CCColor *)color
+{
+    for(CCNode* child in [self children]){
+        [child setColor:color];
+    }
 }
 
 -(void)initializeSpiderWithID:(int)ownerID range:(float)range attack:(float)attack
@@ -40,7 +49,7 @@ const static float UPDATE_TIME = 0.5f;
 
 -(void)collidedWith:(Spider *)sp{
     //attack!
-    if (self.ownerID!=sp.ownerID) {
+    if (self.ownerID!=sp.ownerID&&[[self inRange] containsObject:[self touchedTarget]]) {
         [self resetPath];
         [self setBlocked:false];
         [self setTarget:sp];
@@ -63,6 +72,7 @@ const static float UPDATE_TIME = 0.5f;
 -(void)setToAttack
 {
     [self setSpiderMode:SModeAttack];
+    [self setBlocked:false];
 }
 
 
@@ -72,6 +82,8 @@ const static float UPDATE_TIME = 0.5f;
     }
     [self stopAllActions];
     [self setMode:(long)mode];
+    
+    
     CCLOG(@"[%d] setting mode to %d",[self ownerID],mode);
     CCBAnimationManager* animationManager = [self userObject];
     switch (mode) {
@@ -109,6 +121,7 @@ const static float UPDATE_TIME = 0.5f;
             NSValue *nsv = ([self.path objectAtIndex:_currentPathIndex]);
             CGPoint pt = [nsv CGPointValue];
             _blocked=true;
+            CCLOG(@"schedule walk");
             [self walkTo:pt];
             _currentPathIndex++;
         }
@@ -137,7 +150,6 @@ const static float UPDATE_TIME = 0.5f;
     float len = ccpLength(vector);
     float time = len/[self speed];
     [self rotate:vector];
-    CCLOG(@"walking");
     [self runAction:[CCActionSequence actions:[CCActionMoveTo actionWithDuration:time position:dst], [CCActionCallFunc actionWithTarget:self selector:@selector(Done)],[CCActionCallFunc actionWithTarget:self selector:@selector(walkPath)], nil]];
 }
 
@@ -149,34 +161,34 @@ const static float UPDATE_TIME = 0.5f;
             if ([sp ownerID]!=[self ownerID]) {
                 //enemy!
                 //1 check if it is still in range else remove as target
-                if (![self isInRangeWith:sp]) {
-                    [self setTarget:nil];
-                    if (SModeFollow==[self mode]) {
-                        CCLOG(@"lost target");
-                        [self setSpiderMode:SModeStanding];
-                        [self resetPath];
-                        [self setBlocked:false];
-                    }
-                    return;
-                }
+//                if (![[self inRange] containsObject:sp]) {
+//                    [self setTarget:nil];
+//                    if (SModeFollow==[self mode]) {
+//                        CCLOG(@"lost target");
+//                        [self setSpiderMode:SModeStanding];
+//                        [self resetPath];
+//                        [self setBlocked:false];
+//                    }
+//                    return;
+//                }
                 
                 //2 check if it is slipping away or not
-                if ([sp mode]==SModeWalking) {
+//                if ([sp mode]==SModeWalking) {
                     //chase after it
-                    if ([self mode]==SModeAttack) {
-                        [self resetPath];
-                        [self setSpiderMode:SModeFollow];
-                    }
+//                    if ([self mode]==SModeAttack) {
+//                        [self resetPath];
+//                        [self setSpiderMode:SModeFollow];
+//                    }
                     
                     //only add points if we are in follow mode!
 //                    CCLOG(@"mode is now %f",[self distanceBetweenRect:[sp boundingBox] andPoint:[self position]]);
 
-                    if (SModeFollow==[self mode]) {
-                        CCLOG(@"chasing target");
-
-                        [self addPointToPathToFolow:[sp position]];
-                    }
-                }
+//                    if (SModeFollow==[self mode]) {
+////                        CCLOG(@"chasing target");
+//
+//                        [self addPointToPathToFollow:[sp position]];
+//                    }
+//                }
             }
         }
     }
@@ -188,10 +200,13 @@ const static float UPDATE_TIME = 0.5f;
     [self setSpiderMode:SModeWalking];
 }
 
--(void) addPointToPathToFolow:(CGPoint)pt
+-(void) addPointToPathToFollow:(CGPoint)pt
 {
-    [[self path] addObject:[NSValue valueWithCGPoint:pt]];
-    [self setSpiderMode:SModeFollow];
+//    if (ccpDistance(pt, [self position])>15) {
+    CCLOG(@"adding points to follow");
+        [[self path] addObject:[NSValue valueWithCGPoint:pt]];
+        [self setSpiderMode:SModeFollow];
+//    }
 }
 
 -(void)resetPath
@@ -258,14 +273,25 @@ const static float UPDATE_TIME = 0.5f;
     CGFloat b = powf(closest.x-point.x, 2.f);
     return sqrtf(a + b);
 }
-
+    
 -(void)update:(CCTime)delta
 {
     if (_updateTimeCtr>UPDATE_TIME) {
         [self detectInRange];
-        [self checkTarget];
     }
+    if (_updateTimeCtr>5*UPDATE_TIME) {
+        if (SModeFollow==[self mode]&&![[self path] containsObject:[NSValue valueWithCGPoint:[_touchedTarget position]]]) {
+            CCLOG(@"following touched target %f %f",_touchedTarget.position.x,_touchedTarget.position.y);
+            [self addPointToPathToFollow:[_touchedTarget position]];
+        }
+    }
+    
+    [self checkTarget];
+    
     [self walkPath];
+    NSString *narrativeText = [NSString stringWithFormat:@"%d",[self.path count] ];
+    
+    [_debugMode setString:narrativeText];
     _updateTimeCtr+=delta;
 }
 
