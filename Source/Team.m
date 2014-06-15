@@ -12,10 +12,11 @@ static int ID = 0;
 
 @implementation Team
 
--(id)initWithBase:(Base *)base
+-(id)initWithBase:(Unit *)base
 {
     self = [self init];
     [self setBase:base];
+    [base setOwnerID:[self teamID]];
     [[self assets] addObject:base];
     return self;
 }
@@ -80,7 +81,7 @@ static int ID = 0;
     [[sp physicsBody] setCollisionType:@"spider"];
 //    [[sp physicsBody] setCollisionGroup:strFromInt];
     
-//    CCLOG(@"spider created with a collision type of %d",sp.ownerID);
+//    CCLOG(@"spider created at %f %f",sp.position.x,sp.position.y);
     [[self assets] addObject:sp];
 }
 

@@ -10,7 +10,7 @@
 #import "Team.h"
 //the time we allow certain updates
 
-const static float UPDATE_TIME = 0.5f;
+const static float UPDATE_TIME = 0.25f;
 @implementation Spider{
     float _updateTimeCtr;
     float _attackTimeCtr;
@@ -42,10 +42,7 @@ const static float UPDATE_TIME = 0.5f;
     }
 }
 
--(void)addToHealth:(float)pts
-{
-    [self setHealth:[self health]+pts];
-}
+
 
 -(void)initializeSpiderWithID:(int)ownerID range:(float)range attack:(float)attack
 {
@@ -53,6 +50,7 @@ const static float UPDATE_TIME = 0.5f;
     [self setDetectionRange:range];
     [self setAttack:attack];
 }
+
 
 -(void)collidedWithSpider:(Spider *)sp{
     //attack!
@@ -90,6 +88,7 @@ const static float UPDATE_TIME = 0.5f;
 -(void)collidedWithBase:(Base *)sp{
     //attack!
     if (self.ownerID!=sp.ownerID&&[[self inRange] containsObject:[self target]]) {
+//        CCLOG(@"attack base!");
         [self resetPath];
         [self setBlocked:false];
         
@@ -103,6 +102,10 @@ const static float UPDATE_TIME = 0.5f;
             // call method to start animation after random delay
             [self performSelector:@selector(setToSiege) withObject:nil afterDelay:delay];
         });
+        
+//        if ([sp mode]!=SModeAttack) {
+//            [sp attackedBy:self];
+//        }
         
         [self setBlocked:false];
     }
@@ -126,7 +129,7 @@ const static float UPDATE_TIME = 0.5f;
         return;
     }
     [self stopAllActions];
-    CCLOG(@"stopping all actions");
+//    CCLOG(@"stopping all actions");
     [self setMode:(long)mode];
     CCBAnimationManager* animationManager = [self userObject];
     switch (mode) {
@@ -177,7 +180,7 @@ const static float UPDATE_TIME = 0.5f;
             _blocked=true;
             NSValue *nsv = ([self.path objectAtIndex:_currentPathIndex]);
             CGPoint pt = [nsv CGPointValue];
-//            CCLOG(@"schedule walk");
+//            CCLOG(@"schedule walk to %f,%f from %f,%f",pt.x,pt.y,self.position.x,self.position.y);
             [self walkTo:pt];
             _currentPathIndex++;
         }
@@ -215,6 +218,7 @@ const static float UPDATE_TIME = 0.5f;
         if ([self target].health<=0) {
             [self setTarget:nil];
             [self setSpiderMode:SModeStanding];
+            return;
         }
         if (SModeAttack==[self mode]&&![[self inRange] containsObject:[self target]]) {
             [self setSpiderMode:SModeFollow];
@@ -223,8 +227,6 @@ const static float UPDATE_TIME = 0.5f;
             CCLOG(@"%d following touched target  %f %f",[self mode],[self target].position.x,[self target].position.y);
             [self addPointToPathToFollow:[[self target] position]];
         }
-    }else{
-        [self setTarget:nil];
     }
 }
 
@@ -312,20 +314,21 @@ const static float UPDATE_TIME = 0.5f;
 {
     
     if (_attackTimeCtr>[self attackSpeed]) {
-        if ([self mode]==SModeAttack&&[[self inRange] containsObject:[self target]]){
+//        CCLOG(@"%s",[[self inRange] containsObject:[self target]]?"t":"f");
+        if (([self mode]==SModeAttack||[self mode]==SModeSiege)&&[[self inRange] containsObject:[self target]]){
             [[self target] addToHealth:-1.f*[self attack]];
             _attackTimeCtr=0.f;
         }
     }
 
-    if (_updateTimeCtr>5*UPDATE_TIME) {
+    if (_updateTimeCtr>UPDATE_TIME) {
         [self detectInRange];
         [self checkTarget];
         _updateTimeCtr=0.f;
     }
     
     [self walkPath];
-    NSString *narrativeText = [NSString stringWithFormat:@"%f %d %d %s",[self health],[self.path count],[self mode],[self blocked]?"True":"False" ];
+    NSString *narrativeText = [NSString stringWithFormat:@"%.2f %d %d %f %f",[self health],[self.path count],[self mode],self.position.x,self.position.y ];
     
     [_debugMode setString:narrativeText];
     

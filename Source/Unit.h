@@ -6,6 +6,9 @@
 //  Copyright (c) 2014 Apportable. All rights reserved.
 //
 
+#ifndef SpiderRock_Unit_h
+#define SpiderRock_Unit_h
+
 #import "CCSprite.h"
 
 @interface Unit : CCSprite
@@ -30,3 +33,5 @@
 -(void) addToHealth:(float)pts;
 
 @end
+
+#endif

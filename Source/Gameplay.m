@@ -12,6 +12,7 @@
 #import "Team.h"
 #import "Base.h"
 
+const float PINCH_ZOOM_MULTIPLIER = 0.005f;
 @implementation Gameplay{
     bool _touched;
     CCPhysicsNode *_physicsNode;
@@ -33,31 +34,6 @@
     
 }
 
-// called on every touch in this scene
-//- (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
-//    CGPoint touchLoc = [touch locationInNode:self];
-//    _lastPoint=touchLoc;
-//
-//}
-
-//- (void) touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
-//{ 
-//    CGPoint location = [touch locationInNode:self];
-//    CGPoint diff = ccpSub(location, _lastPoint);
-//    CGPoint newPos =ccpAdd([self position], diff);
-//    CGRect box = [self boundingBox];
-//    CGPoint newBound = ccp(self.position.x+box.size.width,self.position.y+box.size.height);
-////    CCLOG(@"x %f width %f",self.position.x,box.size.width);
-//    CCLOG(@"MOVING x:%f y:%f bounds are %f %f",newPos.x,newPos.y,newBound.x,newBound.y);
-//
-//    if (newPos.x<0&&newPos.y<0&&(newPos.x+box.size.width)<box.size.width&&(newPos.y+box.size.height)<box.size.height) {
-//
-//        [self setPosition:newPos];
-//    }else{
-//        
-//    }
-//}
-
 -(BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair spider:(CCNode *)nodeA spider:(CCNode *)nodeB
 {
     CCLOG(@"collision between spiders!");
@@ -76,34 +52,62 @@
     Base *b;
     a = (Spider *)nodeA;
     b = (Base *)nodeB;
+    [a collidedWithBase:(Base *)nodeB];
 //    [a collidedWith:b];
 //    [b collidedWith:a];
     return true;
 }
 
 -(void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event{
-    CGPoint touchLoc = [touch locationInNode:self];
-    _lastPoint=touchLoc;
-    for(Team* team in teams){
-        Unit *node = [team returnTouchedUnit:touchLoc];
-        if (node) {
-            if ([node isKindOfClass:[Spider class]]) {
-                Spider *sp = (Spider *)node;
-                _touched=true;
-                _touchedSpider = sp;
-                [_touchedSpider resetPath];
-                
-                //if it is following, stop it
+    NSArray* allTouches = [[event allTouches] allObjects];
+    if ([allTouches count] == 2) {
+        _touchedSpider = nil;
+    }else if ([allTouches count] == 1){
+        CGPoint touchLoc = [touch locationInNode:self];
+        CCLOG(@"x %f y %f",touchLoc.x,touchLoc.y);
+        CGPoint converted = [self convertToWorldSpace:touchLoc];
+        CCLOG(@"conv: x %f y %f",converted.x,converted.y);
+        CCLOG(@"word: x %f y %f",self.position.x,self.position.y);
+
+        _lastPoint=touchLoc;
+        for(Team* team in teams){
+            Unit *node = [team returnTouchedUnit:touchLoc];
+            if (node) {
+                if ([node isKindOfClass:[Spider class]]) {
+                    Spider *sp = (Spider *)node;
+                    _touched=true;
+                    _touchedSpider = sp;
+                    [_touchedSpider resetPath];
+                    
+                    //if it is following, stop it
                     [_touchedSpider setSpiderMode:SModeStanding];
-                
-                
-                CCLOG(@"resetPath");
-                return;
-            }else if([node isKindOfClass:[Base class]]){
-                
+                    return;
+                }else if([node isKindOfClass:[Base class]]){
+                    
+                }
             }
         }
     }
+}
+
+- (void) scale:(CGFloat) newScale scaleCenter:(CGPoint) scaleCenter {
+    // scaleCenter is the point to zoom to..
+    // If you are doing a pinch zoom, this should be the center of your pinch.
+    
+    // Get the original center point.
+    CGPoint oldCenterPoint = ccp(scaleCenter.x * self.scale, scaleCenter.y * self.scale);
+    
+    // Set the scale.
+    self.scale = newScale;
+    
+    // Get the new center point.
+    CGPoint newCenterPoint = ccp(scaleCenter.x * self.scale, scaleCenter.y * self.scale);
+    
+    // Then calculate the delta.
+    CGPoint centerPointDelta  = ccpSub(oldCenterPoint, newCenterPoint);
+    
+    // Now adjust your layer by the delta.
+    self.position = ccpAdd(self.position, centerPointDelta);
 }
 
 -(void)touchCancelled:(UITouch *)touch withEvent:(UIEvent *)event{
@@ -111,23 +115,100 @@
 }
 
 -(void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event{
-    CGPoint location = [touch locationInView:[touch view]];
-    location = [[CCDirector sharedDirector] convertToGL:location];
-    if (_touched&&ccpDistance(_lastPoint, location) > 15) {
-        //SAVE THE POINT
-        [_touchedSpider addPointToPath:location];
-//        CCLOG(@"saving points");
-        _lastPoint = location;
+    NSArray* allTouches = [[event allTouches] allObjects];
+    if ([allTouches count] == 2) {
+        // Get two of the touches to handle the zoom
+        UITouch* touchOne = [allTouches objectAtIndex:0];
+        UITouch* touchTwo = [allTouches objectAtIndex:1];
+        
+        // Get the touches and previous touches.
+        CGPoint touchLocationOne = [touchOne locationInView: [touchOne view]];
+        CGPoint touchLocationTwo = [touchTwo locationInView: [touchTwo view]];
+        
+        CGPoint previousLocationOne = [touchOne previousLocationInView: [touchOne view]];
+        CGPoint previousLocationTwo = [touchTwo previousLocationInView: [touchTwo view]];
+        
+        // Get the distance for the current and previous touches.
+        CGFloat currentDistance = sqrt(
+                                       pow(touchLocationOne.x - touchLocationTwo.x, 2.0f) +
+                                       pow(touchLocationOne.y - touchLocationTwo.y, 2.0f));
+        
+        CGFloat previousDistance = sqrt(
+                                        pow(previousLocationOne.x - previousLocationTwo.x, 2.0f) +
+                                        pow(previousLocationOne.y - previousLocationTwo.y, 2.0f));
+        
+        // Get the delta of the distances.
+        CGFloat distanceDelta = currentDistance - previousDistance;
+        
+        // Next, position the camera to the middle of the pinch.
+        // Get the middle position of the pinch.
+        CGPoint pinchCenter = ccpMidpoint(touchLocationOne, touchLocationTwo);
+        
+        // Then, convert the screen position to node space... use your game layer to do this.
+        pinchCenter = [self convertToNodeSpace:pinchCenter];
+        
+        // Finally, call the scale method to scale by the distanceDelta, pass in the pinch center as well.
+        // Also, multiply the delta by PINCH_ZOOM_MULTIPLIER to slow down the scale speed.
+        // A PINCH_ZOOM_MULTIPLIER of 0.005f works for me, but experiment to find one that you like.
+        float newScale = self.scale - (distanceDelta * PINCH_ZOOM_MULTIPLIER)> 0.666f?self.scale - (distanceDelta * PINCH_ZOOM_MULTIPLIER):0.6666f;
+        [self scale:newScale scaleCenter:pinchCenter];
+        if (self.position.x>0) {
+            self.position = ccp(0, self.position.y);
+        }
+        
+        if (self.position.y>0) {
+            self.position = ccp(self.position.x,0);
+        }
+        
+        if (self.position.x<-255) {
+            self.position = ccp(-255, self.position.y);
+        }
+        
+        if (self.position.y<-265) {
+            self.position = ccp(self.position.x, -275);
+        }
+    }else if([allTouches count]==1){
+        CGPoint location = [touch locationInNode:self];
+//        location = [[CCDirector sharedDirector] convertToGL:location];
+        if (_touched&&ccpDistance(_lastPoint, location) > 15*[self scale]) {
+            //SAVE THE POINT
+            [_touchedSpider addPointToPath:location];
+            CCLOG(@"pt %f, %f",location.x,location.y);
+            _lastPoint = location;
+        }else if(!_touched){
+            CGPoint diff = ccpSub(location,_lastPoint);
+            CGPoint newPos = ccp(self.position.x+diff.x,self.position.y+diff.y);
+            [self setPosition:newPos];
+            if (self.position.x>0) {
+                self.position = ccp(0, self.position.y);
+            }
+            
+            if (self.position.y>0) {
+                self.position = ccp(self.position.x,0);
+            }
+            
+            if (self.position.x<-255) {
+                self.position = ccp(-255, self.position.y);
+            }
+            
+            if (self.position.y<-265) {
+                self.position = ccp(self.position.x, -275);
+            }
+        }
     }
-    
 
 }
 
 -(void)touchEnded:(UITouch *)touch withEvent:(UIEvent *)event{
-    if (_touched) {
+    NSArray* allTouches = [[event allTouches] allObjects];
+    if ([allTouches count] == 2) {
+        _touchedSpider = nil;
+    }else if ([allTouches count] == 1&&_touched) {
         _touched=!_touched;
         CGPoint touchLoc = [touch locationInNode:self];
-        [_touchedSpider addPointToPath:touchLoc];
+//        touchLoc = [[CCDirector sharedDirector] convertToGL:touchLoc];
+
+//        [_touchedSpider addPointToPath:touchLoc];
         for(Team* team in teams){
             Unit *node = [team returnTouchedUnit:touchLoc];
             if (node&&node!=_touchedSpider) {
@@ -152,11 +233,12 @@
     
     // draw custom code on top of node and its children
     [self draw_lines];
+//    CCLOG(@"position %f %f %f",self.position.x,self.position.y, self.scale);
 }
 
 - (void) drawCurPoint:(CGPoint)curPoint PrevPoint:(CGPoint)prevPoint
 {
-    float lineWidth = 6.0;
+    float lineWidth = 6.0*[self scale];
     //    ccColor4F r = ccc4f(209.0/255.0, 75.0/255.0, 75.0/255.0, 0.5);
     //    CCColor *red = [CCColor colorWithCcColor4f:r];
     //    //These lines will calculate 4 new points, depending on the width of the line and the saved points
@@ -193,11 +275,12 @@
         unsigned long count = [_touchedSpider.path count];
         
         for (int i = 0; i < (count - 1); i++){
-            CGPoint pos1 = [[_touchedSpider.path objectAtIndex:i] CGPointValue];
-            CGPoint pos2 = [[_touchedSpider.path objectAtIndex:i+1] CGPointValue];
-            if (i%2==0) {
+            CGPoint pos1 = [self convertToWorldSpace:[[_touchedSpider.path objectAtIndex:i] CGPointValue]];
+            CGPoint pos2 = [self convertToWorldSpace:[[_touchedSpider.path objectAtIndex:i+1] CGPointValue]];
+
+//            if (i%2==0) {
                 [self drawCurPoint:pos2 PrevPoint:pos1];
-            }
+//            }
             
         }
     }
@@ -205,14 +288,14 @@
 
 -(void)SpawnTeam1
 {
-    CGPoint real = [_base1 position];
+    CGPoint real = [_base1 positionInPoints];
     Spider *temp = [team1 addSpiderWithX:real.x andY:real.y-30];
     [_physicsNode addChild:temp];
 }
 
 -(void)SpawnTeam2
 {
-    CGPoint real = [_base2 position];
+    CGPoint real = [_base2 positionInPoints];
     Spider *temp = [team2 addSpiderWithX:real.x andY:real.y+30];
     [_physicsNode addChild:temp];
 }

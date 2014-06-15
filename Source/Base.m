@@ -14,12 +14,21 @@
 -(void)didLoadFromCCB
 {
     [[self physicsBody] setCollisionType:@"base"];
+    [self setMaxHealth:250.f];
+    [self setHealth:250.f];
+}
+
+- (void)attackedBy:(Unit *)em
+{
+    [self setTarget:em];
+//    if ([[self target] isKindOfClass:[Spider class]]) {
+//        [self collidedWithSpider:(Spider*)em];
+//    }
 }
 
 -(void)update:(CCTime)delta
 {
-    NSString *narrativeText = [NSString stringWithFormat:@"Health %f/%f ",[self health],[self maxHealth]];
-    
+    NSString *narrativeText = [NSString stringWithFormat:@"%.2f/%.2f ",[self health],[self maxHealth]];
     [_debugMode setString:narrativeText];
 }
 @end

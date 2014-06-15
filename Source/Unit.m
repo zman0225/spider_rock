@@ -9,5 +9,8 @@
 #import "Unit.h"
 
 @implementation Unit
-
+-(void)addToHealth:(float)pts
+{
+    [self setHealth:[self health]+pts];
+}
 @end
