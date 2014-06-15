@@ -7,21 +7,21 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Spider.h"
-#import "constants.h"
 #import "Base.h"
+#import "constants.h"
+#import "Spider.h"
 
 @interface Team : NSObject
 @property (nonatomic) int teamID;
 @property (nonatomic) float points;
 @property (nonatomic,strong) NSMutableArray *assets;
 @property (nonatomic,strong) CCColor *teamColor;
-@property (nonatomic,strong) CCNode *base;
+@property (nonatomic) Base *base;
 
--(id)init;
--(id)initWithBase:(Base *)base;
--(Spider*)returnTouchedSpider:(CGPoint)touchLocation;
--(Spider*)addSpiderWithX:(float)x andY:(float)y;
--(CCNode*)returnTouchedNode:(CGPoint)touchLocation;
-
+-(id) init;
+-(id) initWithBase:(Base *)base;
+-(Spider*) returnTouchedSpider:(CGPoint)touchLocation;
+-(Spider*) addSpiderWithX:(float)x andY:(float)y;
+-(Unit*) returnTouchedUnit:(CGPoint)touchLocation;
+-(void) removeUnit:(Unit *)unit;
 @end

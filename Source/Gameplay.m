@@ -19,8 +19,7 @@
     Spider *_touchedSpider;
     CGPoint _lastPoint;
     Team *team1, *team2;
-    
-    CCSprite *_base1, *_base2;
+    Base *_base1, *_base2;
 }
 
 // is called when CCB file has completed loading
@@ -31,6 +30,7 @@
     teams = [NSMutableArray arrayWithArray:@[team1,team2]];
 //    _physicsNode.debugDraw=true;
     self.userInteractionEnabled=YES;
+    
 }
 
 // called on every touch in this scene
@@ -60,12 +60,24 @@
 
 -(BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair spider:(CCNode *)nodeA spider:(CCNode *)nodeB
 {
-    CCLOG(@"collision!");
+    CCLOG(@"collision between spiders!");
     Spider *a, *b;
     a = (Spider *)nodeA;
     b = (Spider *)nodeB;
-    [a collidedWith:b];
-    [b collidedWith:a];
+    [a collidedWithSpider:b];
+    [b collidedWithSpider:a];
+    return true;
+}
+
+-(BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair spider:(CCNode *)nodeA base:(CCNode *)nodeB
+{
+    CCLOG(@"collision between spider and base!");
+    Spider *a;
+    Base *b;
+    a = (Spider *)nodeA;
+    b = (Base *)nodeB;
+//    [a collidedWith:b];
+//    [b collidedWith:a];
     return true;
 }
 
@@ -73,13 +85,19 @@
     CGPoint touchLoc = [touch locationInNode:self];
     _lastPoint=touchLoc;
     for(Team* team in teams){
-        CCNode *node = [team returnTouchedNode:touchLoc];
+        Unit *node = [team returnTouchedUnit:touchLoc];
         if (node) {
             if ([node isKindOfClass:[Spider class]]) {
                 Spider *sp = (Spider *)node;
                 _touched=true;
                 _touchedSpider = sp;
                 [_touchedSpider resetPath];
+                
+                //if it is following, stop it
+                    [_touchedSpider setSpiderMode:SModeStanding];
+                
+                
+                CCLOG(@"resetPath");
                 return;
             }else if([node isKindOfClass:[Base class]]){
                 
@@ -111,17 +129,18 @@
         CGPoint touchLoc = [touch locationInNode:self];
         [_touchedSpider addPointToPath:touchLoc];
         for(Team* team in teams){
-            CCNode *node = [team returnTouchedNode:touchLoc];
-            if (node) {
+            Unit *node = [team returnTouchedUnit:touchLoc];
+            if (node&&node!=_touchedSpider) {
 ////                [_touchedSpider resetPath];
-                [_touchedSpider setMode:SModeFollow];
-                [_touchedSpider setTouchedTarget:node];
-                CCLOG(@"added");
+                [_touchedSpider setSpiderMode:SModeFollow];
+                [_touchedSpider setTarget:node];
+                CCLOG(@"Target set");
 //                [_touchedSpider addPointToPathToFollow:[node position]];
                 _touchedSpider = nil;
                 return;
             }
         }
+        CCLOG(@"end touched");
         _touchedSpider = nil;
     }
 }

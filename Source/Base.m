@@ -8,9 +8,18 @@
 
 #import "Base.h"
 
-@implementation Base
+@implementation Base{
+    CCLabelTTF *_debugMode;
+}
 -(void)didLoadFromCCB
 {
+    [[self physicsBody] setCollisionType:@"base"];
+}
+
+-(void)update:(CCTime)delta
+{
+    NSString *narrativeText = [NSString stringWithFormat:@"Health %f/%f ",[self health],[self maxHealth]];
     
+    [_debugMode setString:narrativeText];
 }
 @end

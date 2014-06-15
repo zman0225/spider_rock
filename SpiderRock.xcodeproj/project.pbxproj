@@ -39,6 +39,7 @@
 		FE4B1583194791E500807327 /* Base.m in Sources */ = {isa = PBXBuildFile; fileRef = FE4B1582194791E500807327 /* Base.m */; };
 		FE4B15871947EDDA00807327 /* Gameplay.m in Sources */ = {isa = PBXBuildFile; fileRef = FE4B15861947EDDA00807327 /* Gameplay.m */; };
 		FEC67D7B19460A5000A66C6E /* Spider.m in Sources */ = {isa = PBXBuildFile; fileRef = FEC67D7A19460A5000A66C6E /* Spider.m */; };
+		FED71F1B194E1051006C60DE /* Unit.m in Sources */ = {isa = PBXBuildFile; fileRef = FED71F1A194E1051006C60DE /* Unit.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,8 @@
 		FE4B15861947EDDA00807327 /* Gameplay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Gameplay.m; path = Source/Gameplay.m; sourceTree = "<group>"; };
 		FEC67D7919460A5000A66C6E /* Spider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Spider.h; path = Source/Spider.h; sourceTree = "<group>"; };
 		FEC67D7A19460A5000A66C6E /* Spider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Spider.m; path = Source/Spider.m; sourceTree = "<group>"; };
+		FED71F19194E1051006C60DE /* Unit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Unit.h; path = Source/Unit.h; sourceTree = "<group>"; };
+		FED71F1A194E1051006C60DE /* Unit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Unit.m; path = Source/Unit.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +151,8 @@
 				FE4B1582194791E500807327 /* Base.m */,
 				FE4B15851947EDDA00807327 /* Gameplay.h */,
 				FE4B15861947EDDA00807327 /* Gameplay.m */,
+				FED71F19194E1051006C60DE /* Unit.h */,
+				FED71F1A194E1051006C60DE /* Unit.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -341,6 +346,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FE4B15871947EDDA00807327 /* Gameplay.m in Sources */,
+				FED71F1B194E1051006C60DE /* Unit.m in Sources */,
 				FE0771581946B81C00482184 /* Team.m in Sources */,
 				B737893F1807617C0076A88C /* AppDelegate.m in Sources */,
 				B7378994180767190076A88C /* MainScene.m in Sources */,

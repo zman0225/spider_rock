@@ -30,7 +30,7 @@ static int ID = 0;
     self.assets = [NSMutableArray array];
     [self setPoints:200];
     [self setTeamColor:[CCColor colorWithCcColor3b:ccc3(arc4random()%255,arc4random()%255,arc4random()%255)]];
-    CCLOG(@"colors %d",(int)self.teamColor.ccColor3b.b);
+//    CCLOG(@"colors %d",(int)self.teamColor.ccColor3b.b);
     return self;
 }
 
@@ -50,9 +50,9 @@ static int ID = 0;
     return nil;
 }
 
--(CCNode*)returnTouchedNode:(CGPoint)touchLocation
+-(Unit*)returnTouchedUnit:(CGPoint)touchLocation
 {
-    for(CCNode *node in [self assets]){
+    for(Unit *node in [self assets]){
         CGRect rect = CGRectMake(node.position.x+node.contentSize.width/2, node.position.y+node.contentSize.height/2, -1*node.contentSize.width, -1*node.contentSize.height);
         if (CGRectContainsPoint(rect,touchLocation)) {
             return node;
@@ -68,6 +68,7 @@ static int ID = 0;
     spider.color = [self teamColor];
     [spider setOwnerID:[self teamID]];
     [self addSpider:spider];
+    [spider setTeam:self];
     spider.position = ccp(x,y);
     return spider;
 }
@@ -77,15 +78,15 @@ static int ID = 0;
     int ran = arc4random()%10;
     NSString *strFromInt = [NSString stringWithFormat:@"%d",ran];
     [[sp physicsBody] setCollisionType:@"spider"];
-    [[sp physicsBody] setCollisionGroup:strFromInt];
+//    [[sp physicsBody] setCollisionGroup:strFromInt];
     
-    CCLOG(@"spider created with a collision type of %d",sp.ownerID);
+//    CCLOG(@"spider created with a collision type of %d",sp.ownerID);
     [[self assets] addObject:sp];
 }
 
--(void)removeSpider:(Spider*)sp
-{
-    [[self assets] removeObject:sp];
-    [sp removeFromParent];
+
+-(void) removeUnit:(Unit *)unit{
+    [[self assets] removeObject:unit];
+    [unit removeFromParent];
 }
 @end

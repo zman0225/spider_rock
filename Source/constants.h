@@ -17,6 +17,7 @@ typedef NS_ENUM(NSInteger, SpiderMode) {
     SModeDeath,
     SModeAttack,
     SModeFollow,
+    SModeSiege,
     SModeLast
 };
 

@@ -6,28 +6,22 @@
 //  Copyright (c) 2014 Apportable. All rights reserved.
 //
 
-#import "CCSprite.h"
+#import "Unit.h"
+#import "Base.h"
+#import "constants.h"
 
-@interface Spider : CCSprite 
+
+@interface Spider : Unit
 @property (nonatomic,strong) NSMutableArray *path;
 @property (nonatomic) int currentPathIndex;
 @property (nonatomic) bool walking;
 @property (nonatomic) bool blocked;
-@property (nonatomic) long mode;
 @property (nonatomic) NSInteger speed;
-@property (nonatomic) float detectionRange;
-@property (nonatomic) int ownerID;
-@property (nonatomic) float attack;
-@property (nonatomic) NSSet *inRange;
-@property (nonatomic) CCNode *target;
-@property (nonatomic) CCNode *touchedTarget;
-@property (nonatomic) float capacity;
-@property (nonatomic) float health;
-
 
 -(void)initializeSpiderWithID:(int)ownerID range:(float)range attack:(float)attack;
+-(void)setSpiderMode:(SpiderMode)mode;
 -(void)walkPath;
--(void)collidedWith:(Spider *)sp;
+-(void)collidedWithSpider:(Spider *)sp;
 -(void)resetPath;
 -(void) addPointToPath:(CGPoint)pt;
 -(void) addPointToPathToFollow:(CGPoint)pt;

@@ -7,21 +7,23 @@
 //
 
 #import "Spider.h"
-#import "constants.h"
-
+#import "Team.h"
 //the time we allow certain updates
 
 const static float UPDATE_TIME = 0.5f;
 @implementation Spider{
     float _updateTimeCtr;
+    float _attackTimeCtr;
     CCLabelTTF *_debugMode;
 }
 
 //we treat this as a spider spawn
 - (void)didLoadFromCCB
 {
-    CCLOG(@"label say %@",[_debugMode string]);
+//    CCLOG(@"label say %@",[_debugMode string]);
+    [self setHealth:250.f];
     [self setAttack:15.f];
+    [self setAttackSpeed:1.f];
     [self setSpeed:25.f];
     [self setWalking:true];
     [self setBlocked:false];
@@ -40,6 +42,11 @@ const static float UPDATE_TIME = 0.5f;
     }
 }
 
+-(void)addToHealth:(float)pts
+{
+    [self setHealth:[self health]+pts];
+}
+
 -(void)initializeSpiderWithID:(int)ownerID range:(float)range attack:(float)attack
 {
     [self setOwnerID:ownerID];
@@ -47,12 +54,11 @@ const static float UPDATE_TIME = 0.5f;
     [self setAttack:attack];
 }
 
--(void)collidedWith:(Spider *)sp{
+-(void)collidedWithSpider:(Spider *)sp{
     //attack!
-    if (self.ownerID!=sp.ownerID&&[[self inRange] containsObject:[self touchedTarget]]) {
+    if (self.ownerID!=sp.ownerID&&[[self inRange] containsObject:[self target]]) {
         [self resetPath];
         [self setBlocked:false];
-        [self setTarget:sp];
         
         [self rotate:ccpSub(sp.position, self.position)];
         
@@ -64,10 +70,44 @@ const static float UPDATE_TIME = 0.5f;
             // call method to start animation after random delay
             [self performSelector:@selector(setToAttack) withObject:nil afterDelay:delay];
         });
+        if ([sp mode]!=SModeAttack) {
+            [sp setSpiderMode:SModeAttack];
+            [sp attackedBy:self];
+        }
         
         [self setBlocked:false];
     }
 }
+
+- (void)attackedBy:(Unit *)em
+{
+    [self setTarget:em];
+    if ([[self target] isKindOfClass:[Spider class]]) {
+        [self collidedWithSpider:(Spider*)em];
+    }
+}
+
+-(void)collidedWithBase:(Base *)sp{
+    //attack!
+    if (self.ownerID!=sp.ownerID&&[[self inRange] containsObject:[self target]]) {
+        [self resetPath];
+        [self setBlocked:false];
+        
+        [self rotate:ccpSub(sp.position, self.position)];
+        
+        double delayInSeconds = 1.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            // generate a random number between 0.0 and 2.0
+            float delay = (arc4random() % 800) / 1000.f;
+            // call method to start animation after random delay
+            [self performSelector:@selector(setToSiege) withObject:nil afterDelay:delay];
+        });
+        
+        [self setBlocked:false];
+    }
+}
+
 
 -(void)setToAttack
 {
@@ -75,16 +115,19 @@ const static float UPDATE_TIME = 0.5f;
     [self setBlocked:false];
 }
 
+-(void)setToSiege
+{
+    [self setSpiderMode:SModeSiege];
+    [self setBlocked:false];
+}
 
 -(void)setSpiderMode:(SpiderMode)mode{
     if (((NSInteger)mode==[self mode])||(SModeLast<=mode||mode<0)) {
         return;
     }
     [self stopAllActions];
+    CCLOG(@"stopping all actions");
     [self setMode:(long)mode];
-    
-    
-    CCLOG(@"[%d] setting mode to %d",[self ownerID],mode);
     CCBAnimationManager* animationManager = [self userObject];
     switch (mode) {
         case SModeSpawn:
@@ -98,15 +141,22 @@ const static float UPDATE_TIME = 0.5f;
         
         case SModeFollow:
         case SModeWalking:
+            [self Done];
             [animationManager runAnimationsForSequenceNamed:@"Walking"];
             [self setWalking:true];
             break;
             
         case SModeDeath:
             [animationManager runAnimationsForSequenceNamed:@"Death"];
+            float delay = 1.0f;
+            [self performSelector:@selector(removeSelf) withObject:nil afterDelay:delay];
             break;
         
         case SModeAttack:
+            [animationManager runAnimationsForSequenceNamed:@"Attacking"];
+            break;
+            
+        case SModeSiege:
             [animationManager runAnimationsForSequenceNamed:@"Attacking"];
             break;
             
@@ -115,13 +165,19 @@ const static float UPDATE_TIME = 0.5f;
     }
 }
 
+-(void) removeSelf
+{
+    Team *t = (Team *)[self team];
+    [t removeUnit:self];
+}
+
 -(void)walkPath{
     if (_currentPathIndex<[[self path] count]) {
         if (_walking&&!_blocked) {
+            _blocked=true;
             NSValue *nsv = ([self.path objectAtIndex:_currentPathIndex]);
             CGPoint pt = [nsv CGPointValue];
-            _blocked=true;
-            CCLOG(@"schedule walk");
+//            CCLOG(@"schedule walk");
             [self walkTo:pt];
             _currentPathIndex++;
         }
@@ -156,41 +212,19 @@ const static float UPDATE_TIME = 0.5f;
 -(void) checkTarget
 {
     if ([self target]) {
-        if ([[self target] isKindOfClass:[Spider class]]) {
-            Spider *sp = (Spider*)[self target];
-            if ([sp ownerID]!=[self ownerID]) {
-                //enemy!
-                //1 check if it is still in range else remove as target
-//                if (![[self inRange] containsObject:sp]) {
-//                    [self setTarget:nil];
-//                    if (SModeFollow==[self mode]) {
-//                        CCLOG(@"lost target");
-//                        [self setSpiderMode:SModeStanding];
-//                        [self resetPath];
-//                        [self setBlocked:false];
-//                    }
-//                    return;
-//                }
-                
-                //2 check if it is slipping away or not
-//                if ([sp mode]==SModeWalking) {
-                    //chase after it
-//                    if ([self mode]==SModeAttack) {
-//                        [self resetPath];
-//                        [self setSpiderMode:SModeFollow];
-//                    }
-                    
-                    //only add points if we are in follow mode!
-//                    CCLOG(@"mode is now %f",[self distanceBetweenRect:[sp boundingBox] andPoint:[self position]]);
-
-//                    if (SModeFollow==[self mode]) {
-////                        CCLOG(@"chasing target");
-//
-//                        [self addPointToPathToFollow:[sp position]];
-//                    }
-//                }
-            }
+        if ([self target].health<=0) {
+            [self setTarget:nil];
+            [self setSpiderMode:SModeStanding];
         }
+        if (SModeAttack==[self mode]&&![[self inRange] containsObject:[self target]]) {
+            [self setSpiderMode:SModeFollow];
+        }
+        if (SModeFollow==[self mode]&&![[self path] containsObject:[NSValue valueWithCGPoint:[[self target] position]]]) {
+            CCLOG(@"%d following touched target  %f %f",[self mode],[self target].position.x,[self target].position.y);
+            [self addPointToPathToFollow:[[self target] position]];
+        }
+    }else{
+        [self setTarget:nil];
     }
 }
 
@@ -203,7 +237,7 @@ const static float UPDATE_TIME = 0.5f;
 -(void) addPointToPathToFollow:(CGPoint)pt
 {
 //    if (ccpDistance(pt, [self position])>15) {
-    CCLOG(@"adding points to follow");
+//    CCLOG(@"adding points to follow");
         [[self path] addObject:[NSValue valueWithCGPoint:pt]];
         [self setSpiderMode:SModeFollow];
 //    }
@@ -276,23 +310,30 @@ const static float UPDATE_TIME = 0.5f;
     
 -(void)update:(CCTime)delta
 {
-    if (_updateTimeCtr>UPDATE_TIME) {
-        [self detectInRange];
-    }
-    if (_updateTimeCtr>5*UPDATE_TIME) {
-        if (SModeFollow==[self mode]&&![[self path] containsObject:[NSValue valueWithCGPoint:[_touchedTarget position]]]) {
-            CCLOG(@"following touched target %f %f",_touchedTarget.position.x,_touchedTarget.position.y);
-            [self addPointToPathToFollow:[_touchedTarget position]];
+    
+    if (_attackTimeCtr>[self attackSpeed]) {
+        if ([self mode]==SModeAttack&&[[self inRange] containsObject:[self target]]){
+            [[self target] addToHealth:-1.f*[self attack]];
+            _attackTimeCtr=0.f;
         }
     }
-    
-    [self checkTarget];
+
+    if (_updateTimeCtr>5*UPDATE_TIME) {
+        [self detectInRange];
+        [self checkTarget];
+        _updateTimeCtr=0.f;
+    }
     
     [self walkPath];
-    NSString *narrativeText = [NSString stringWithFormat:@"%d",[self.path count] ];
+    NSString *narrativeText = [NSString stringWithFormat:@"%f %d %d %s",[self health],[self.path count],[self mode],[self blocked]?"True":"False" ];
     
     [_debugMode setString:narrativeText];
+    
+    if ([self health]<=0) {
+        [self setSpiderMode:SModeDeath];
+    }
     _updateTimeCtr+=delta;
+    _attackTimeCtr+=delta;
 }
 
 @end

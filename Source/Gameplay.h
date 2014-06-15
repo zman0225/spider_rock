@@ -7,7 +7,9 @@
 //
 
 #import "CCNode.h"
-
+#import "Base.h"
 @interface Gameplay : CCNode <CCPhysicsCollisionDelegate>
+//@property (nonatomic,strong) Base *base1;
+//@property (nonatomic,strong) Base *base2;
 
 @end
