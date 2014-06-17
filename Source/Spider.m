@@ -53,7 +53,7 @@ const static float UPDATE_TIME = 0.25f;
 
 
 -(void)collidedWithSpider:(Spider *)sp{
-    //attack!
+    //attack if it is a target, else ignore for now
     if (self.ownerID!=sp.ownerID&&[[self inRange] containsObject:[self target]]) {
         [self resetPath];
         [self setBlocked:false];

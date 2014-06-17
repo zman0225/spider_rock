@@ -27,6 +27,8 @@
 
 #import "CCSprite9Slice.h"
 #import "CCTexture_Private.h"
+#import "CCDrawingPrimitives.h"
+
 
 // ---------------------------------------------------------------------
 

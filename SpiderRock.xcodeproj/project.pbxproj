@@ -40,6 +40,10 @@
 		FE4B15871947EDDA00807327 /* Gameplay.m in Sources */ = {isa = PBXBuildFile; fileRef = FE4B15861947EDDA00807327 /* Gameplay.m */; };
 		FEC67D7B19460A5000A66C6E /* Spider.m in Sources */ = {isa = PBXBuildFile; fileRef = FEC67D7A19460A5000A66C6E /* Spider.m */; };
 		FED71F1B194E1051006C60DE /* Unit.m in Sources */ = {isa = PBXBuildFile; fileRef = FED71F1A194E1051006C60DE /* Unit.m */; };
+		FED71F21194E55B9006C60DE /* GameLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FED71F20194E55B9006C60DE /* GameLayer.m */; };
+		FED71F24194E5881006C60DE /* MenuLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FED71F23194E5881006C60DE /* MenuLayer.m */; };
+		FED71F27194E67D3006C60DE /* BaseMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = FED71F26194E67D3006C60DE /* BaseMenu.m */; };
+		FED71F2A194E67ED006C60DE /* MenuListing.m in Sources */ = {isa = PBXBuildFile; fileRef = FED71F29194E67ED006C60DE /* MenuListing.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,6 +108,14 @@
 		FEC67D7A19460A5000A66C6E /* Spider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Spider.m; path = Source/Spider.m; sourceTree = "<group>"; };
 		FED71F19194E1051006C60DE /* Unit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Unit.h; path = Source/Unit.h; sourceTree = "<group>"; };
 		FED71F1A194E1051006C60DE /* Unit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Unit.m; path = Source/Unit.m; sourceTree = "<group>"; };
+		FED71F1F194E55B9006C60DE /* GameLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameLayer.h; path = Source/GameLayer.h; sourceTree = "<group>"; };
+		FED71F20194E55B9006C60DE /* GameLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GameLayer.m; path = Source/GameLayer.m; sourceTree = "<group>"; };
+		FED71F22194E5881006C60DE /* MenuLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MenuLayer.h; path = Source/MenuLayer.h; sourceTree = "<group>"; };
+		FED71F23194E5881006C60DE /* MenuLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MenuLayer.m; path = Source/MenuLayer.m; sourceTree = "<group>"; };
+		FED71F25194E67D3006C60DE /* BaseMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseMenu.h; path = Source/BaseMenu.h; sourceTree = "<group>"; };
+		FED71F26194E67D3006C60DE /* BaseMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BaseMenu.m; path = Source/BaseMenu.m; sourceTree = "<group>"; };
+		FED71F28194E67ED006C60DE /* MenuListing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MenuListing.h; path = Source/MenuListing.h; sourceTree = "<group>"; };
+		FED71F29194E67ED006C60DE /* MenuListing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MenuListing.m; path = Source/MenuListing.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +163,14 @@
 				FE4B1582194791E500807327 /* Base.m */,
 				FE4B15851947EDDA00807327 /* Gameplay.h */,
 				FE4B15861947EDDA00807327 /* Gameplay.m */,
+				FED71F1F194E55B9006C60DE /* GameLayer.h */,
+				FED71F20194E55B9006C60DE /* GameLayer.m */,
+				FED71F22194E5881006C60DE /* MenuLayer.h */,
+				FED71F23194E5881006C60DE /* MenuLayer.m */,
+				FED71F25194E67D3006C60DE /* BaseMenu.h */,
+				FED71F26194E67D3006C60DE /* BaseMenu.m */,
+				FED71F28194E67ED006C60DE /* MenuListing.h */,
+				FED71F29194E67ED006C60DE /* MenuListing.m */,
 				FED71F19194E1051006C60DE /* Unit.h */,
 				FED71F1A194E1051006C60DE /* Unit.m */,
 			);
@@ -346,12 +366,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				FE4B15871947EDDA00807327 /* Gameplay.m in Sources */,
+				FED71F27194E67D3006C60DE /* BaseMenu.m in Sources */,
 				FED71F1B194E1051006C60DE /* Unit.m in Sources */,
 				FE0771581946B81C00482184 /* Team.m in Sources */,
 				B737893F1807617C0076A88C /* AppDelegate.m in Sources */,
+				FED71F24194E5881006C60DE /* MenuLayer.m in Sources */,
 				B7378994180767190076A88C /* MainScene.m in Sources */,
+				FED71F2A194E67ED006C60DE /* MenuListing.m in Sources */,
 				FEC67D7B19460A5000A66C6E /* Spider.m in Sources */,
 				FE4B1583194791E500807327 /* Base.m in Sources */,
+				FED71F21194E55B9006C60DE /* GameLayer.m in Sources */,
 				B73789871807631A0076A88C /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

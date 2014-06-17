@@ -31,6 +31,7 @@
 #import "CCSpriteFrame.h"
 #import "CCSpriteFrameCache.h"
 #import "CCAnimation.h"
+#import "CCDrawingPrimitives.h"
 #import "CCAnimationCache.h"
 #import "CCTextureCache.h"
 #import "CCShaderCache.h"

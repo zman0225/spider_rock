@@ -17,6 +17,7 @@
 @interface Team : NSObject
 @property (nonatomic) int teamID;
 @property (nonatomic) float points;
+@property (nonatomic) float mana;
 @property (nonatomic,strong) NSMutableArray *assets;
 @property (nonatomic,strong) CCColor *teamColor;
 @property (nonatomic) Unit *base;
@@ -27,6 +28,7 @@
 -(Spider*) addSpiderWithX:(float)x andY:(float)y;
 -(Unit*) returnTouchedUnit:(CGPoint)touchLocation;
 -(void) removeUnit:(Unit *)unit;
+
 @end
 
 #endif
